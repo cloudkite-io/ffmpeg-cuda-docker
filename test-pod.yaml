@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-gpu-pod
+spec:
+  containers:
+  - name: my-gpu-container
+    image: us.gcr.io/cloudkite-public/nvidia-php8.1-fpm-ffmpeg-bullseye:latest
+    imagePullPolicy: Always
+    command: ["/bin/bash", "-c", "--"]
+    args: ["while true; do sleep 99999; done;"]
+    resources:
+      limits:
+       nvidia.com/gpu: 1

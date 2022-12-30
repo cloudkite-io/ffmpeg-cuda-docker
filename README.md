@@ -5,14 +5,17 @@ This Dockerfile builds a custom ffmpeg library with `nv-codec-headers` that is a
 * nv-codec-headers sdk/9.0
 * ffmpeg 5.1
 
-See the Dockerfile for specific ffmpeg build flags.
+Additional variations:
+* Debian Bullseye + PHP 8.1 FPM
+
+See the Dockerfiles for specific ffmpeg build flags.
 
 ## Build
 ```bash
 docker build --target=ffmpeg-cuda -t us.gcr.io/cloudkite-public/ffmpeg-cuda:latest .
 ```
 
-The included Dockerfile is heavily optimized for image size - weighing in around 875mb with all of the required libraries to run ffmpeg.
+The included Dockerfiles are heavily optimized for image size - weighing in around 875mb with all of the required libraries to run ffmpeg.
 
 ## Deployment on GKE
 For GKE 1.23 and greater with a COS nodepool with GPUs, you need to manually install Google's `nvidia-driver-installer` (or configure ArgoCD to deploy):
