@@ -61,12 +61,8 @@ RUN apt -y install build-essential cmake gcc git libc6 libc6-dev libtool nasm nv
 # Ffmpeg
 WORKDIR /src
 # Install libaom from source.
-RUN mkdir -p ~/ffmpeg_sources/libaom && \
-  cd ~/ffmpeg_sources/libaom && \
-  git clone https://aomedia.googlesource.com/aom && \
-  cmake ./aom && \
-  make && \
-  sudo make install
+RUN git clone https://aomedia.googlesource.com/aom && cmake ./aom && \
+  make && make install
 RUN git clone https://github.com/FFmpeg/nv-codec-headers.git -b old/sdk/9.0 && cd nv-codec-headers && \
       make && make install
 RUN git clone https://github.com/FFmpeg/FFmpeg -b release/5.1 && \ 
