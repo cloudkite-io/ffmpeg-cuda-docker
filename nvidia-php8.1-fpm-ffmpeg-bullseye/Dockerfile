@@ -60,6 +60,8 @@ FROM base as ffmpeg-builder
 RUN apt -y install build-essential cmake gcc git libc6 libc6-dev libtool nasm nvidia-cuda-toolkit yasm
 # Ffmpeg
 WORKDIR /src
+RUN git clone --depth=1 https://gitlab.com/AOMediaCodec/SVT-AV1 && cd SVT-AV1/Build && cmake .. -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release \
+    && make -j $(nproc) && make install
 # Install libaom from source.
 RUN git clone https://aomedia.googlesource.com/aom && cmake ./aom && \
   make && make install
@@ -91,6 +93,7 @@ RUN git clone https://github.com/FFmpeg/FFmpeg -b release/5.1 && \
         --enable-openssl \
         --enable-pic \
         --enable-static \
+        --enable-libsvtav1 \
         --extra-cflags="-I/usr/local/nvidia/include/" \
         --extra-ldflags="-L/usr/local/nvidia/lib64/" && \
     make -j$(nproc) && make install
