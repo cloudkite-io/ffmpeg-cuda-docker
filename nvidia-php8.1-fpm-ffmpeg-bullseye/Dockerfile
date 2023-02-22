@@ -71,7 +71,6 @@ RUN git clone https://github.com/FFmpeg/FFmpeg -b release/5.1 && \
       cd /src/FFmpeg && \
         ./configure \
         --prefix="/usr/local" \
-        --enable-libaom \
         --disable-debug \
         --enable-cuda \
         --enable-cuda-llvm \
@@ -79,10 +78,12 @@ RUN git clone https://github.com/FFmpeg/FFmpeg -b release/5.1 && \
         --enable-cuvid \
         --enable-ffnvcodec \
         --enable-gpl \
+        --enable-libaom \
         --enable-libass \
         --enable-libfdk-aac \
         --enable-libnpp \
         --enable-librtmp \
+        --enable-libsvtav1 \
         --enable-libvorbis \
         --enable-libvpx \
         --enable-libx264 \
@@ -93,7 +94,6 @@ RUN git clone https://github.com/FFmpeg/FFmpeg -b release/5.1 && \
         --enable-openssl \
         --enable-pic \
         --enable-static \
-        --enable-libsvtav1 \
         --extra-cflags="-I/usr/local/nvidia/include/" \
         --extra-ldflags="-L/usr/local/nvidia/lib64/" && \
     make -j$(nproc) && make install
