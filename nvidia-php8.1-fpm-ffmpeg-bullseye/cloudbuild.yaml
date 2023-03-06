@@ -1,9 +1,9 @@
 substitutions:
-  _CLOUDSDK_COMPUTE_REGION: us-central1
   _GCLOUD_PROJECT: cloudkite-public
   _GCR_REGISTRY: nvidia-php8.1-fpm-ffmpeg-bullseye
+  _IMAGE_TAG: latest
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '-t', 'us.gcr.io/${_GCLOUD_PROJECT}/${_GCR_REGISTRY}:${COMMIT_SHA}', '.' ]
+  args: [ 'build', '-t', 'us.gcr.io/${_GCLOUD_PROJECT}/${_GCR_REGISTRY}:${_IMAGE_TAG}', '.' ]
 images:
-- us.gcr.io/${_GCLOUD_PROJECT}/${_GCR_REGISTRY}:${COMMIT_SHA}
+- us.gcr.io/${_GCLOUD_PROJECT}/${_GCR_REGISTRY}:${_IMAGE_TAG}

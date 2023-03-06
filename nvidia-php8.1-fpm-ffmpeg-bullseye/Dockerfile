@@ -57,24 +57,13 @@ RUN apt install -y \
 # Use base image to build ffmpeg binary 
 FROM base as ffmpeg-builder
 # Install build tools
-RUN apt -y install build-essential cmake gcc git libc6 libc6-dev libtool nasm nvidia-cuda-toolkit yasm
+RUN apt -y install build-essential cmake gcc git libc6 libc6-dev libtool nasm nvidia-cuda-toolkit yasm software-properties-common
 # Ffmpeg
 WORKDIR /src
-RUN apt-get update -y && apt-get install -y wget openssl cmake libevent-dev libjpeg-dev libgif-dev libpng-dev libwebp-dev libmagickwand-dev imagemagick libmemcached-dev
-RUN wget http://www.imagemagick.org/download/ImageMagick-7.1.0-62.tar.gz && \
-    tar zxvf ImageMagick-7.1.0-62.tar.gz && \
-    cd ImageMagick-7.1.0-62 && \
-    ./configure  --prefix=/usr/local  && \
-    make && make install
-ARG ZIMG_VERSION=2.7.0 
-ARG ZIMG_URL="https://github.com/sekrit-twc/zimg/archive/release-$ZIMG_VERSION.tar.gz"
-ARG ZIMG_SHA256=219d1bc6b7fde1355d72c9b406ebd730a4aed9c21da779660f0a4c851243e32f
-RUN \
-  wget $WGET_OPTS -O zimg.tar.gz "$ZIMG_URL" && \
-  echo "$ZIMG_SHA256  zimg.tar.gz" | sha256sum --status -c - && \
-  tar xf zimg.tar.gz && \
-  cd zimg-* && ./autogen.sh && ./configure --disable-shared --enable-static && \
-  make -j$(nproc) install
+# install libzimg
+RUN add-apt-repository "deb http://www.deb-multimedia.org bullseye main" && \
+    apt-get update -oAcquire::AllowInsecureRepositories=true && apt-get install -y deb-multimedia-keyring --allow-unauthenticated && \
+    apt-get update && apt-get install -y libzimg-dev
 RUN git clone --depth=1 https://gitlab.com/AOMediaCodec/SVT-AV1 && cd SVT-AV1/Build && cmake .. -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release \
     && make -j $(nproc) && make install
 # Install libaom from source.
