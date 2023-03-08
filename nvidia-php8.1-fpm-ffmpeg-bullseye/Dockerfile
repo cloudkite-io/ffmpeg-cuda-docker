@@ -60,10 +60,6 @@ FROM base as ffmpeg-builder
 RUN apt -y install build-essential cmake gcc git libc6 libc6-dev libtool nasm nvidia-cuda-toolkit yasm software-properties-common
 # Ffmpeg
 WORKDIR /src
-# install libzimg
-RUN add-apt-repository "deb http://www.deb-multimedia.org bullseye main" && \
-    apt-get update -oAcquire::AllowInsecureRepositories=true && apt-get install -y deb-multimedia-keyring --allow-unauthenticated && \
-    apt-get update && apt-get install -y libzimg-dev
 RUN git clone --depth=1 https://gitlab.com/AOMediaCodec/SVT-AV1 && cd SVT-AV1/Build && cmake .. -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release \
     && make -j $(nproc) && make install
 # Install libaom from source.
@@ -71,6 +67,10 @@ RUN git clone https://aomedia.googlesource.com/aom && cmake ./aom && \
   make && make install
 RUN git clone https://github.com/FFmpeg/nv-codec-headers.git -b old/sdk/9.0 && cd nv-codec-headers && \
       make && make install
+# install libzimg
+RUN add-apt-repository "deb http://www.deb-multimedia.org bullseye main" && \
+    apt-get update -oAcquire::AllowInsecureRepositories=true && apt-get install -y deb-multimedia-keyring --allow-unauthenticated && \
+    apt-get update && apt-get install -y libzimg-dev && echo "/usr/lib/x86_64-linux-gnu" >> /etc/ld.so.conf && ldconfig
 RUN git clone https://github.com/FFmpeg/FFmpeg -b release/5.1 && \ 
       cd /src/FFmpeg && \
         ./configure \
