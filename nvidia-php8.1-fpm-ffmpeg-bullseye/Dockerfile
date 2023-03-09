@@ -30,8 +30,8 @@ ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
 FROM nvidia as base
 ENV DEBIAN_FRONTEND noninteractive
 ENV TZ Etc/UTC
-ENV LD_LIBRARY_PATH /usr/local/nvidia/lib64
-ENV PKG_CONFIG_PATH /usr/local/lib/pkgconfig/
+ENV LD_LIBRARY_PATH /usr/local/nvidia/lib64:/usr/local/lib
+ENV PKG_CONFIG_PATH /usr/local/lib/pkgconfig:/src/zimg
 ENV NVIDIA_VISIBLE_DEVICES all
 ENV NVIDIA_DRIVER_CAPABILITIES video,compute,utility
 # Update base and install build tools
@@ -65,16 +65,15 @@ RUN git clone --depth=1 https://gitlab.com/AOMediaCodec/SVT-AV1 && cd SVT-AV1/Bu
 # Install libaom from source.
 RUN git clone https://aomedia.googlesource.com/aom && cmake ./aom && \
   make && make install
-RUN git clone https://github.com/FFmpeg/nv-codec-headers.git -b old/sdk/9.0 && cd nv-codec-headers && \
+RUN git clone https://github.com/FFmpeg/nv-codec-headers.git -b sdk/11.1 && cd nv-codec-headers && \
       make && make install
 # install libzimg
-ARG zimg_version=release-3.0.4
 RUN git clone --branch release-3.0.4 --depth 1 https://github.com/sekrit-twc/zimg && cd zimg  &&\
      ./autogen.sh &&\
-     ./configure --enable-static  --prefix=/usr/local --disable-shared &&\
-     make -j $(nproc) &&\
+     ./configure &&\
+     make -j $(nproc) && \
      make install
-RUN git clone https://github.com/FFmpeg/FFmpeg -b release/5.1 && \ 
+RUN git clone https://github.com/FFmpeg/FFmpeg -b release/6.0 && \
       cd /src/FFmpeg && \
         ./configure \
         --prefix="/usr/local" \
@@ -106,7 +105,7 @@ RUN git clone https://github.com/FFmpeg/FFmpeg -b release/5.1 && \
         --extra-ldflags="-L/usr/local/nvidia/lib64/" && \
     make -j$(nproc) && make install
 
-
 # Copy ffmpeg binary back to base image without compilation layers
 FROM base as nvidia-php-ffmpeg 
+COPY --from=ffmpeg-builder /usr/local/lib /usr/local/lib
 COPY --from=ffmpeg-builder /usr/local/bin /usr/local/bin
