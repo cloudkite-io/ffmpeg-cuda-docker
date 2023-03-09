@@ -57,7 +57,7 @@ RUN apt install -y \
 # Use base image to build ffmpeg binary 
 FROM base as ffmpeg-builder
 # Install build tools
-RUN apt -y install build-essential cmake gcc git libc6 libc6-dev libtool nasm nvidia-cuda-toolkit yasm software-properties-common
+RUN apt -y install build-essential cmake gcc git libc6 libc6-dev libtool nasm nvidia-cuda-toolkit yasm
 # Ffmpeg
 WORKDIR /src
 RUN git clone --depth=1 https://gitlab.com/AOMediaCodec/SVT-AV1 && cd SVT-AV1/Build && cmake .. -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release \
@@ -68,9 +68,12 @@ RUN git clone https://aomedia.googlesource.com/aom && cmake ./aom && \
 RUN git clone https://github.com/FFmpeg/nv-codec-headers.git -b old/sdk/9.0 && cd nv-codec-headers && \
       make && make install
 # install libzimg
-RUN add-apt-repository "deb http://www.deb-multimedia.org bullseye main" && \
-    apt-get update -oAcquire::AllowInsecureRepositories=true && apt-get install -y deb-multimedia-keyring --allow-unauthenticated && \
-    apt-get update && apt-get install -y libzimg-dev && echo "/usr/lib/x86_64-linux-gnu" >> /etc/ld.so.conf && ldconfig
+ARG zimg_version=release-3.0.4
+RUN git clone --branch release-3.0.4 --depth 1 https://github.com/sekrit-twc/zimg && cd zimg  &&\
+     ./autogen.sh &&\
+     ./configure --enable-static  --prefix=/usr/local --disable-shared &&\
+     make -j $(nproc) &&\
+     make install
 RUN git clone https://github.com/FFmpeg/FFmpeg -b release/5.1 && \ 
       cd /src/FFmpeg && \
         ./configure \
